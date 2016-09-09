@@ -3,20 +3,23 @@ from parameters import *
 from functions import *
 import time
 import random
+from classes import GameMenu
+
 
 #initialize pygame
 pygame.init()
 surface = pygame.display.set_mode((width, height))
-font = pygame.font.SysFont("Courier", 16)
+font = pygame.font.SysFont("Courier", )
 
 #initailize variables
 clock = time.time()
 frame = 0
-obstacles = [400.0]
+obstacles = [[400.0, 200]]
 pos = 0.0 #pixels
 vel = 0.0 #pixles/second
+spawn_chance = initial_spawn_chance
 
-while 1:
+while mainloop:
 
     #restrict framerate to specified FPS
     delta = int(period - (time.time() - clock))
@@ -32,10 +35,15 @@ while 1:
             vel = jump_vel
 
     #Generate and move obstacles
+    if frame % spawn_chance_increment == 0:
+        spawn_chance -= 1
+        if spawn_chance < 1:
+            spawn_chance = 1
+        print(delta)
     for i in range(len(obstacles)):
-        obstacles[i] -= speed/FPS
-    if random.randint(1,50) == 1:
-        obstacles.append(float(width))
+        obstacles[i][0] -= speed/FPS
+    if random.randint(1,spawn_chance) == 1:
+        obstacles.append([float(width), random.randint(1,height-obstacle_height)])
 
     #calculate player position
     pos += vel/FPS
@@ -43,6 +51,15 @@ while 1:
     if pos < 0:
         pos = 0.0
         vel = 0.0
+    elif pos > height-player_height:
+        pos = height-player_height
+        vel = 0.0
+
+    #check for a collision
+    for i in range(len(obstacles)):
+        if player_offset-obstacle_width < obstacles[i][0] < player_offset+player_width:
+            if pos < height - obstacles[i][1] < pos + player_height + obstacle_height:
+                print("HIT")
 
     #draw the window
     draw_window(surface)
@@ -54,3 +71,5 @@ while 1:
     frame += 1
 
 pygame.quit()
+
+

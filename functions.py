@@ -1,19 +1,22 @@
 from parameters import *
 
-def draw_window(surface):
-    surface.fill(background_color)
-
 def draw_obstacles(surface, obstacles):
 
-    from_top = height-obstacle_height
-
     for i in range(len(obstacles)):
-        from_left = obstacles[i]
+        from_left = obstacles[i][0]
+        from_top = obstacles[i][1]
         surface.fill(obstacle_color, (from_left,from_top,obstacle_width,obstacle_height))
-
 
 def draw_player(surface, pos):
 
-    from_top = height - player_height - pos
-    from_left = 30
-    surface.fill(player_color, (from_left, from_top, player_width, player_height))
+    y_pos = height - player_height - pos
+    x_pos = player_offset
+    surface.fill(player_color, (x_pos, y_pos, player_width, player_height))
+
+def draw_text(surface, font, list, color):
+    for i in range(len(list)):
+        text = font.render(list[i], 1, color)
+        wth = text.get_width()
+        hth = text.get_height()
+        surface.blit(text, (width / 2 - wth / 2, 100 + hth*i))
+
